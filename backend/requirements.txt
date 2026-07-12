@@ -1,0 +1,18 @@
+# Core Web Framework
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+
+# Configuration & Validation
+pydantic>=2.7.0
+pydantic-settings>=2.2.1
+
+# Database & ORM
+sqlalchemy>=2.0.30
+psycopg2-binary>=2.9.9
+
+# Security & Authentication
+pyjwt>=2.8.0
+passlib[bcrypt]>=1.7.4
+
+# Optional: Gemini SDK (Member 3 will likely bump or verify this version)
+google-generativeai>=0.5.2
