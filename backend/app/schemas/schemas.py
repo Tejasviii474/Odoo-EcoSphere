@@ -1,7 +1,16 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional, List, TypeVar, Generic
 from datetime import datetime
 from ..db.models import ChallengeStatus, ParticipationStatus, ComplianceStatus, CategoryType
+
+T = TypeVar('T')
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    """Generic schema for paginated API responses. Enables seamless data tables on the frontend."""
+    data: List[T]
+    total: int
+    skip: int
+    limit: int
 
 # --- User Schemas ---
 class UserBase(BaseModel):

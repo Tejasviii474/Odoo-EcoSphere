@@ -13,19 +13,35 @@ router = APIRouter(
     tags=["Gamification"]
 )
 
-@router.get("/leaderboard", response_model=List[schemas.User])
-def get_leaderboard(limit: int = 10, db: Session = Depends(get_db)):
+@router.get("/leaderboard", response_model=schemas.PaginatedResponse[schemas.User])
+def get_leaderboard(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """
-    Get the top employees ordered by Total XP.
+    Get the top employees ordered by Total XP with pagination metadata.
     """
-    return db.query(models.User).order_by(desc(models.User.total_xp)).limit(limit).all()
+    total = db.query(models.User).count()
+    data = db.query(models.User).order_by(desc(models.User.total_xp)).offset(skip).limit(limit).all()
+    
+    return {
+        "data": data,
+        "total": total,
+        "skip": skip,
+        "limit": limit
+    }
 
-@router.get("/challenges", response_model=List[schemas.Challenge])
+@router.get("/challenges", response_model=schemas.PaginatedResponse[schemas.Challenge])
 def get_challenges(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
-    Retrieve all sustainability challenges.
+    Retrieve all sustainability challenges with pagination metadata.
     """
-    return db.query(models.Challenge).offset(skip).limit(limit).all()
+    total = db.query(models.Challenge).count()
+    data = db.query(models.Challenge).offset(skip).limit(limit).all()
+    
+    return {
+        "data": data,
+        "total": total,
+        "skip": skip,
+        "limit": limit
+    }
 
 @router.post("/challenges/participate", response_model=schemas.ChallengeParticipation)
 def participate_in_challenge(
