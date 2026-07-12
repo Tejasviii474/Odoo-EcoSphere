@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Nature-inspired Green & Light Theme */
+    --background: 120 20% 98%;
+    --foreground: 120 10% 10%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 120 10% 10%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 10% 10%;
+    
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 120 20% 90%;
+    --secondary-foreground: 120 10% 20%;
+    
+    --muted: 120 20% 90%;
+    --muted-foreground: 120 10% 40%;
+    
+    --accent: 142 76% 90%;
+    --accent-foreground: 142 76% 20%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 120 20% 86%;
+    --input: 120 20% 86%;
+    --ring: 142 76% 36%;
+    
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Deep Forest Dark Theme */
+    --background: 120 20% 5%;
+    --foreground: 120 10% 90%;
+    
+    --card: 120 20% 8%;
+    --card-foreground: 120 10% 90%;
+    
+    --popover: 120 20% 8%;
+    --popover-foreground: 120 10% 90%;
+    
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 120 20% 15%;
+    --secondary-foreground: 120 10% 90%;
+    
+    --muted: 120 20% 15%;
+    --muted-foreground: 120 10% 60%;
+    
+    --accent: 142 76% 15%;
+    --accent-foreground: 142 76% 90%;
+    
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 120 20% 20%;
+    --input: 120 20% 20%;
+    --ring: 142 76% 36%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Glassmorphism Custom Utilities */
+@layer utilities {
+  .glass {
+    @apply bg-white/60 dark:bg-black/40 backdrop-blur-lg border border-white/20 dark:border-white/10 shadow-lg;
+  }
+  
+  .glass-card {
+    @apply bg-white/80 dark:bg-gray-900/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-800/50 shadow-sm rounded-xl;
+  }
+}
