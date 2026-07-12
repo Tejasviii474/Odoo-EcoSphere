@@ -3,35 +3,32 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 
-def get_application() -> FastAPI:
-    """
-    Initialize and configure the FastAPI application.
-    """
-    application = FastAPI(
-        title=settings.PROJECT_NAME,
-        openapi_url=f"{settings.API_V1_STR}/openapi.json",
-        description="Core API for the EcoSphere ESG Management Platform.",
-        version="1.0.0",
-        docs_url="/docs",
-        redoc_url="/redoc",
-    )
+# We will import our routers here as they are developed
+# from app.api import auth, departments, reports
 
-    # Configure CORS Middleware
-    # WARNING: allow_origins=["*"] is used for hackathon development speed. 
-    # For production, this should be restricted to the specific frontend domains.
-    application.add_middleware(
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    description="Backend API for EcoSphere - ESG Management Platform"
+)
+
+# Configure CORS Middleware for frontend communication
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"], 
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
-    return application
+# We will mount our routers here once they are created
+# app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
+# app.include_router(departments.router, prefix=f"{settings.API_V1_STR}/departments", tags=["Departments"])
+# app.include_router(reports.router, prefix=f"{settings.API_V1_STR}/reports", tags=["Reports"])
 
-app = get_application()
-
-@app.get("/", tags=["Health Check"])
+@app.get("/", tags=["Health"])
 def health_check():
     """
     Root endpoint to verify the API is running.
@@ -39,14 +36,5 @@ def health_check():
     return {
         "status": "online",
         "project": settings.PROJECT_NAME,
-        "message": "EcoSphere API is up and running!"
+        "version": settings.VERSION
     }
-
-# ==========================================
-# ROUTER INCLUSIONS
-# ==========================================
-# As we build the individual modules (auth, environmental, social, etc.), 
-# we will import their routers and include them here.
-# Example:
-# from app.api.auth import router as auth_router
-# app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["Auth"])
