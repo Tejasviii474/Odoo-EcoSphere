@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 
 // We use Inter for a clean, modern, and premium typography feel.
 const inter = Inter({ subsets: ["latin"] });
@@ -17,20 +19,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="antialiased">
-      {/* 
-        The body uses our custom background and text colors defined in globals.css.
-        We set up a flex container so we can easily drop in the Sidebar later.
-      */}
       <body className={`${inter.className} min-h-screen bg-background text-foreground flex overflow-hidden`}>
         
-        {/* Placeholder for Sidebar Component (To be created) */}
-        {/* <Sidebar /> */}
+        {/* Sidebar Component */}
+        <Sidebar />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col h-screen overflow-y-auto bg-gray-50/50 dark:bg-black/50">
           
-          {/* Placeholder for Navbar/Header Component (To be created) */}
-          {/* <Navbar /> */}
+          {/* Navbar Component */}
+          <Navbar />
           
           <main className="flex-1 p-6 md:p-8">
             {children}
