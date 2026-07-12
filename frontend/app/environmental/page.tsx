@@ -1,15 +1,33 @@
 "use client";
 
-import { Leaf, PlusCircle, Factory, Car, Package, FileText } from "lucide-react";
+import { useState } from "react";
+import { Leaf, PlusCircle, Factory, Car, Package, FileText, CheckCircle2 } from "lucide-react";
 
 export default function EnvironmentalPage() {
-  // Mock data for the demo
-  const recentTransactions = [
-    { id: "TX-1042", type: "Fleet Operations", amount: "500 L Fuel", co2: "1,190 kg", date: "Today, 10:00 AM", status: "Auto-Calculated", icon: Car },
-    { id: "TX-1041", type: "Manufacturing", amount: "12,000 kWh", co2: "4,600 kg", date: "Yesterday, 3:30 PM", status: "Auto-Calculated", icon: Factory },
-    { id: "TX-1040", type: "Supply Chain", amount: "Freight (200 miles)", co2: "350 kg", date: "Jul 10, 2026", status: "Auto-Calculated", icon: Package },
-    { id: "TX-1039", type: "Office Operations", amount: "Paper/Supplies", co2: "45 kg", date: "Jul 09, 2026", status: "Manual Entry", icon: FileText },
-  ];
+  const [notification, setNotification] = useState("");
+  const [co2Total, setCo2Total] = useState(6185);
+  const [recentTransactions, setRecentTransactions] = useState([
+    { id: "TX-1042", type: "Fleet Operations", amount: "500 L Fuel", co2: 1190, date: "Today, 10:00 AM", status: "Auto-Calculated", icon: Car },
+    { id: "TX-1041", type: "Manufacturing", amount: "12,000 kWh", co2: 4600, date: "Yesterday, 3:30 PM", status: "Auto-Calculated", icon: Factory },
+    { id: "TX-1040", type: "Supply Chain", amount: "Freight (200 miles)", co2: 350, date: "Jul 10, 2026", status: "Auto-Calculated", icon: Package },
+    { id: "TX-1039", type: "Office Operations", amount: "Paper/Supplies", co2: 45, date: "Jul 09, 2026", status: "Manual Entry", icon: FileText },
+  ]);
+
+  const handleSimulateERP = () => {
+    const newTx = {
+      id: `TX-${Math.floor(1000 + Math.random() * 9000)}`,
+      type: "Logistics Sync",
+      amount: "Freight (120 miles)",
+      co2: 240,
+      date: "Just now",
+      status: "Auto-Calculated",
+      icon: Package
+    };
+    setRecentTransactions([newTx, ...recentTransactions].slice(0, 5));
+    setCo2Total(prev => prev + 240);
+    setNotification("Successfully imported new logistics data from ERP!");
+    setTimeout(() => setNotification(""), 3000);
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -25,11 +43,22 @@ export default function EnvironmentalPage() {
         </div>
         
         {/* Simulate ERP Data Button - Crucial for the Hackathon Demo */}
-        <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm">
+        <button 
+          onClick={handleSimulateERP} 
+          className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm"
+        >
           <PlusCircle className="w-4 h-4" />
           Simulate ERP Data
         </button>
       </div>
+
+      {/* Floating Notification */}
+      {notification && (
+        <div className="fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-in slide-in-from-top-2 duration-300">
+          <CheckCircle2 className="w-5 h-5" />
+          <span className="font-medium">{notification}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
@@ -38,7 +67,7 @@ export default function EnvironmentalPage() {
           <div className="glass-card p-6 bg-gradient-to-br from-emerald-500/10 to-transparent border-emerald-500/20">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">Total CO2e This Month</h3>
             <div className="text-4xl font-extrabold text-foreground mb-1">
-              6,185 <span className="text-lg font-medium text-muted-foreground">kg</span>
+              {co2Total.toLocaleString()} <span className="text-lg font-medium text-muted-foreground">kg</span>
             </div>
             <p className="text-sm text-emerald-600 font-medium mt-2 flex items-center gap-1">
               ↓ 12% compared to last month
@@ -114,7 +143,7 @@ export default function EnvironmentalPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-muted-foreground">{tx.amount}</td>
-                        <td className="px-6 py-4 font-bold text-foreground">{tx.co2}</td>
+                        <td className="px-6 py-4 font-bold text-foreground">{tx.co2.toLocaleString()} kg</td>
                         <td className="px-6 py-4">
                           <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                             tx.status === "Auto-Calculated" 

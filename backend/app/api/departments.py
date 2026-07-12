@@ -3,9 +3,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db, get_current_user
-from app.models.database_models import User, Department, DepartmentScore
-# Assuming Member 3 provides these schemas in app/schemas/pydantic_schemas.py
-from app.schemas.pydantic_schemas import DepartmentResponse, DepartmentScoreResponse
+from app.db.models import User, Department, DepartmentScore
+from app.schemas.schemas import DepartmentResponse, DepartmentScoreResponse
 
 router = APIRouter()
 
@@ -18,8 +17,18 @@ def get_departments(
     Retrieve all active departments. 
     Requires a valid JWT Bearer token.
     """
-    departments = db.query(Department).filter(Department.status == "active").all()
-    return departments
+    departments = db.query(Department).filter(Department.status == True).all()
+    # Map to schema response
+    return [
+        {
+            "id": str(dept.id),
+            "name": dept.name,
+            "code": dept.code,
+            "employee_count": dept.employee_count,
+            "status": dept.status
+        }
+        for dept in departments
+    ]
 
 @router.get("/scores", response_model=List[DepartmentScoreResponse])
 def get_department_scores(

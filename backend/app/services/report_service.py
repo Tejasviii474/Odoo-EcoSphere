@@ -2,7 +2,7 @@ from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 
 # We assume Member 3 has defined these models matching our blueprint schema
-from app.models.database_models import CarbonTransaction, CsrActivity, ComplianceIssue
+from app.db.models import CarbonTransaction, CSRActivity, ComplianceIssue
 
 def generate_custom_report(
     db: Session,
@@ -19,14 +19,9 @@ def generate_custom_report(
     """
     results = []
     
-    # Note: In a production scenario, date strings should be explicitly converted 
-    # to datetime objects. SQLAlchemy can usually handle ISO format string comparisons.
-    
     # --- 1. Environmental Data Collection ---
     if module in [None, "env", "all"]:
         query = db.query(CarbonTransaction)
-        if department_id:
-            query = query.filter(CarbonTransaction.department_id == department_id)
         if start_date:
             query = query.filter(CarbonTransaction.transaction_date >= start_date)
         if end_date:
@@ -35,34 +30,36 @@ def generate_custom_report(
         for tx in query.all():
             results.append({
                 "module": "environmental",
-                "department_id": str(tx.department_id),
-                "metric": tx.source_type,
-                "value": float(tx.calculated_emissions),
+                "department_id": "Global",
+                "metric": tx.source_operation or "Unknown",
+                "value": float(tx.calculated_emission or 0),
                 "date": tx.transaction_date.isoformat() if tx.transaction_date else None,
-                "description": f"Carbon emission from {tx.source_type} ({tx.source_id})"
+                "description": f"Carbon emission from {tx.source_operation}"
             })
             
     # --- 2. Social Data Collection ---
     if module in [None, "social", "all"]:
-        query = db.query(CsrActivity)
+        query = db.query(CSRActivity)
         if start_date:
-            query = query.filter(CsrActivity.start_date >= start_date)
+            query = query.filter(CSRActivity.date >= start_date)
         if end_date:
-            query = query.filter(CsrActivity.end_date <= end_date)
+            query = query.filter(CSRActivity.date <= end_date)
             
         for act in query.all():
             results.append({
                 "module": "social",
                 "department_id": "Global",  # CSR activities are often company-wide
-                "metric": "points_reward",
-                "value": act.points_reward,
-                "date": act.start_date.isoformat() if act.start_date else None,
+                "metric": "activity",
+                "value": 1.0,
+                "date": act.date.isoformat() if act.date else None,
                 "description": act.title
             })
             
     # --- 3. Governance Data Collection ---
     if module in [None, "gov", "all"]:
         query = db.query(ComplianceIssue)
+        if department_id:
+            query = query.filter(ComplianceIssue.owner_id == department_id)
         if start_date:
             query = query.filter(ComplianceIssue.due_date >= start_date)
         if end_date:

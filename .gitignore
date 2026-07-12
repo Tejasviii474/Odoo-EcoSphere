@@ -1,0 +1,70 @@
+# =========================
+# Operating System Files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# IDEs and Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# =========================
+# Python / FastAPI (Backend)
+# =========================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.env
+.venv
+env.bak/
+venv.bak/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Databases
+*.sqlite3
+*.db
+backend/ecosphere.db
+backend/test.db
+
+# Logs
+logs/
+*.log
+
+# =========================
+# Node.js / Next.js (Frontend)
+# =========================
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+pnpm-debug.log
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Vercel / Deployment
+.vercel/
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Misc
+.eslintcache

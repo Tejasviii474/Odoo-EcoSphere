@@ -4,16 +4,64 @@ import { Leaf, ArrowRight, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+import { authApi } from "@/lib/api";
+
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call for the demo, then redirect
-    setTimeout(() => {
+    setError("");
+    
+    try {
+      const data = await authApi.login({ email, password });
+      // Store token
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      // Redirect
       window.location.href = "/dashboard";
-    }, 800);
+    } catch (err: any) {
+      setError(err.message || "Failed to login. Please check credentials.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleHackathonLogin = async (role: "employee" | "admin") => {
+    // For demo purposes, we will register/login dynamically or use a preset
+    setIsLoading(true);
+    try {
+      const emailToUse = role === "admin" ? "admin@company.com" : "employee@company.com";
+      const pwToUse = "hackathon123";
+      
+      // Try login, if fails try register then login
+      try {
+        const data = await authApi.login({ email: emailToUse, password: pwToUse });
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        window.location.href = "/dashboard";
+      } catch (loginErr) {
+        // Fallback to register then login
+        await authApi.register({ 
+          email: emailToUse, 
+          password: pwToUse, 
+          name: role === "admin" ? "ESG Admin" : "Test Employee",
+          role: role,
+          department_id: 1
+        });
+        const data = await authApi.login({ email: emailToUse, password: pwToUse });
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        window.location.href = "/dashboard";
+      }
+    } catch (err: any) {
+      setError("Hackathon auto-login failed.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -56,11 +104,15 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
+            {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm font-medium">{error}</div>}
+            
             <div className="space-y-1">
               <label className="text-sm font-medium text-foreground">Work Email</label>
               <input 
                 type="email" 
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="jane.doe@company.com" 
                 className="w-full px-4 py-3 bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground transition-all"
               />
@@ -74,6 +126,8 @@ export default function LoginPage() {
               <input 
                 type="password" 
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••" 
                 className="w-full px-4 py-3 bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground transition-all"
               />
@@ -93,11 +147,11 @@ export default function LoginPage() {
           <div className="mt-10 pt-6 border-t border-border">
             <p className="text-xs text-muted-foreground text-center uppercase tracking-wider font-semibold mb-4">Hackathon Quick Login</p>
             <div className="grid grid-cols-2 gap-3">
-              <button onClick={handleLogin} className="flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 text-foreground text-sm font-medium py-2.5 rounded-lg transition-colors border border-border">
+              <button type="button" onClick={() => handleHackathonLogin("employee")} className="flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 text-foreground text-sm font-medium py-2.5 rounded-lg transition-colors border border-border">
                 <User className="w-4 h-4" />
                 Employee
               </button>
-              <button onClick={handleLogin} className="flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium py-2.5 rounded-lg transition-colors border border-primary/20">
+              <button type="button" onClick={() => handleHackathonLogin("admin")} className="flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium py-2.5 rounded-lg transition-colors border border-primary/20">
                 <Leaf className="w-4 h-4" />
                 ESG Admin
               </button>

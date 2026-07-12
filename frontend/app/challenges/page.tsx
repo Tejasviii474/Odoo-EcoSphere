@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Trophy, Medal, ArrowRight, Upload, Clock, CheckCircle2 } from "lucide-react";
 
 export default function ChallengesPage() {
-  // Mock data for the hackathon demo
-  const activeChallenges = [
+  const [notification, setNotification] = useState("");
+  const [activeChallenges, setActiveChallenges] = useState([
     {
       id: 1,
       title: "Bike to Work Week",
@@ -32,7 +33,17 @@ export default function ChallengesPage() {
       category: "Social",
       timeLeft: "5 days",
     }
-  ];
+  ]);
+
+  const handleSubmitProof = (id: number, title: string) => {
+    setActiveChallenges(challenges => 
+      challenges.map(challenge => 
+        challenge.id === id ? { ...challenge, status: "under_review" } : challenge
+      )
+    );
+    setNotification(`Proof submitted for "${title}". Awaiting review!`);
+    setTimeout(() => setNotification(""), 3000);
+  };
 
   const leaderboard = [
     { rank: 1, name: "Alice Smith", department: "Engineering", xp: 1250 },
@@ -60,6 +71,14 @@ export default function ChallengesPage() {
           </div>
         </div>
       </div>
+
+      {/* Floating Notification */}
+      {notification && (
+        <div className="fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-in slide-in-from-top-2 duration-300">
+          <CheckCircle2 className="w-5 h-5" />
+          <span className="font-medium">{notification}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
@@ -91,7 +110,10 @@ export default function ChallengesPage() {
                   </div>
                   
                   {challenge.status === "active" ? (
-                    <button className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    <button 
+                      onClick={() => handleSubmitProof(challenge.id, challenge.title)}
+                      className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
                       <Upload className="w-4 h-4" />
                       Submit Proof
                     </button>
@@ -133,7 +155,13 @@ export default function ChallengesPage() {
                 </li>
               ))}
             </ul>
-            <button className="w-full mt-4 flex items-center justify-center gap-2 text-sm text-primary hover:text-primary/80 font-medium py-2">
+            <button 
+              onClick={() => {
+                setNotification("Full Leaderboard syncing...");
+                setTimeout(() => setNotification(""), 2000);
+              }}
+              className="w-full mt-4 flex items-center justify-center gap-2 text-sm text-primary hover:text-primary/80 font-medium py-2"
+            >
               View Full Rankings <ArrowRight className="w-4 h-4" />
             </button>
           </div>

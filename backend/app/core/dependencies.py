@@ -4,25 +4,11 @@ import jwt
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-# Assuming Member 3 has implemented database engine & SessionLocal
-from app.core.database import SessionLocal
-# Assuming Member 3 has implemented the SQLAlchemy User model
-from app.models.database_models import User
+from app.db.session import get_db, SessionLocal
+from app.db.models import User
 
 # This defines the standard OAuth2 URL where clients can fetch the token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
-
-
-def get_db():
-    """
-    Dependency to yield a SQLAlchemy database session for each request.
-    Ensures the session is safely closed after the request is processed.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 def get_current_user(

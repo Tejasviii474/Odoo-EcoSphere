@@ -8,7 +8,7 @@ from ..schemas import schemas
 from ..services.ai_service import AIService
 
 # Assume authentication dependency is provided by the Team Leader in core.security
-from ..core.security import get_current_user
+from ..core.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/social",

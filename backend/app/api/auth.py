@@ -5,8 +5,8 @@ from app.core.dependencies import get_db
 from app.core.security import verify_password, get_password_hash, create_access_token
 # We assume Member 3 provides the User model and these Pydantic schemas 
 # based on our finalized Execution Blueprint.
-from app.models.database_models import User
-from app.schemas.pydantic_schemas import UserCreate, UserLogin, TokenResponse
+from app.db.models import User
+from app.schemas.schemas import UserCreate, UserLogin, TokenResponse
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     new_user = User(
         email=user_in.email,
         hashed_password=hashed_password,
-        full_name=user_in.full_name,
+        name=user_in.name,
         role=user_in.role,
         department_id=user_in.department_id,
         status="active"
@@ -85,6 +85,6 @@ def login(user_in: UserLogin, db: Session = Depends(get_db)):
             "id": str(user.id),
             "email": user.email,
             "role": user.role,
-            "full_name": user.full_name
+            "name": user.name
         }
     }

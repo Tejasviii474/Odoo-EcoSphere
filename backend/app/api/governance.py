@@ -6,7 +6,7 @@ from datetime import datetime
 from ..db.session import get_db
 from ..db import models
 from ..schemas import schemas
-from ..core.security import get_current_user
+from ..core.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/governance",

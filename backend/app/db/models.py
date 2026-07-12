@@ -34,6 +34,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, default="employee")
+    status = Column(String, default="active")
     department_id = Column(Integer, ForeignKey("departments.id"))
     total_xp = Column(Integer, default=0)
     

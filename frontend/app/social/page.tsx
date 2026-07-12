@@ -1,10 +1,11 @@
 "use client";
 
-import { Users, HeartHandshake, MapPin, Calendar, Star } from "lucide-react";
+import { useState } from "react";
+import { Users, HeartHandshake, MapPin, Calendar, Star, CheckCircle2 } from "lucide-react";
 
 export default function SocialPage() {
-  // Mock data for the demo
-  const csrActivities = [
+  const [notification, setNotification] = useState("");
+  const [csrActivities, setCsrActivities] = useState([
     {
       id: 1,
       title: "Local Beach Cleanup",
@@ -14,6 +15,7 @@ export default function SocialPage() {
       spotsLeft: 12,
       totalSpots: 50,
       image: "bg-blue-100 dark:bg-blue-900/30",
+      registered: false,
     },
     {
       id: 2,
@@ -24,6 +26,7 @@ export default function SocialPage() {
       spotsLeft: 4,
       totalSpots: 20,
       image: "bg-purple-100 dark:bg-purple-900/30",
+      registered: false,
     },
     {
       id: 3,
@@ -34,8 +37,23 @@ export default function SocialPage() {
       spotsLeft: 0,
       totalSpots: 100,
       image: "bg-emerald-100 dark:bg-emerald-900/30",
+      registered: false,
     }
-  ];
+  ]);
+
+  const handleRegister = (id: number, title: string) => {
+    setCsrActivities(activities => 
+      activities.map(activity => {
+        if (activity.id === id && activity.spotsLeft > 0 && !activity.registered) {
+          return { ...activity, spotsLeft: activity.spotsLeft - 1, registered: true };
+        }
+        return activity;
+      })
+    );
+    setNotification(`Successfully registered for: ${title}`);
+    setTimeout(() => setNotification(""), 3000);
+  };
+
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -60,6 +78,14 @@ export default function SocialPage() {
         </div>
       </div>
 
+      {/* Floating Notification */}
+      {notification && (
+        <div className="fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-in slide-in-from-top-2 duration-300">
+          <CheckCircle2 className="w-5 h-5" />
+          <span className="font-medium">{notification}</span>
+        </div>
+      )}
+
       {/* CSR Activities Grid */}
       <div>
         <div className="flex items-center justify-between border-b border-border pb-2 mb-6">
@@ -67,7 +93,16 @@ export default function SocialPage() {
             <HeartHandshake className="w-5 h-5 text-blue-500" />
             Upcoming Opportunities
           </h2>
-          <button className="text-sm text-primary font-medium hover:underline">View Past Events</button>
+          <button 
+            onClick={() => {
+              setNotification("Fetching archived events...");
+              setTimeout(() => setNotification("No past events found in the current period."), 1500);
+              setTimeout(() => setNotification(""), 4500);
+            }} 
+            className="text-sm text-primary font-medium hover:underline"
+          >
+            View Past Events
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -105,14 +140,17 @@ export default function SocialPage() {
                   </div>
                   
                   <button 
-                    disabled={activity.spotsLeft === 0}
+                    onClick={() => handleRegister(activity.id, activity.title)}
+                    disabled={activity.spotsLeft === 0 || activity.registered}
                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                      activity.spotsLeft === 0 
-                        ? "bg-secondary text-muted-foreground cursor-not-allowed" 
-                        : "bg-blue-600 text-white hover:bg-blue-700"
+                      activity.registered
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 cursor-default"
+                        : activity.spotsLeft === 0 
+                          ? "bg-secondary text-muted-foreground cursor-not-allowed" 
+                          : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
                   >
-                    {activity.spotsLeft === 0 ? "Waitlist" : "Register Now"}
+                    {activity.registered ? "Registered" : activity.spotsLeft === 0 ? "Waitlist" : "Register Now"}
                   </button>
                 </div>
               </div>

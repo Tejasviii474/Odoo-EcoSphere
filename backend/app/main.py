@@ -5,7 +5,12 @@ from app.core.config import settings
 from app.middleware.middleware import TimingMiddleware
 
 # Import our routers 
-from app.api import auth, departments, reports
+from app.api import auth, departments, reports, ai, gamification, governance, social
+from app.db.session import engine, Base
+from app.db import models
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -31,6 +36,10 @@ if settings.BACKEND_CORS_ORIGINS:
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
 app.include_router(departments.router, prefix=f"{settings.API_V1_STR}/departments", tags=["Departments"])
 app.include_router(reports.router, prefix=f"{settings.API_V1_STR}/reports", tags=["Reports"])
+app.include_router(ai.router, prefix=f"{settings.API_V1_STR}")
+app.include_router(gamification.router, prefix=f"{settings.API_V1_STR}")
+app.include_router(governance.router, prefix=f"{settings.API_V1_STR}")
+app.include_router(social.router, prefix=f"{settings.API_V1_STR}")
 
 @app.get("/", tags=["Health"])
 def health_check():

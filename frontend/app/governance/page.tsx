@@ -1,10 +1,60 @@
 "use client";
 
 import { ShieldCheck, AlertTriangle, FileText, CheckCircle, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { governanceApi } from "@/lib/api";
 
 export default function GovernancePage() {
-  // Mock data for the demo
-  const complianceIssues = [
+  const [complianceIssues, setComplianceIssues] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [notification, setNotification] = useState("");
+
+  useEffect(() => {
+    async function loadIssues() {
+      try {
+        const data = await governanceApi.getComplianceIssues();
+        const formatted = data.map((d: any) => ({
+          id: `ISS-${d.id}`,
+          title: `Audit Review (ID: ${d.audit_id || d.id})`,
+          description: d.description,
+          severity: d.severity,
+          status: d.status,
+          owner: `Owner ${d.owner_id || 'Global'}`,
+          dueDate: d.due_date,
+        }));
+        setComplianceIssues(formatted.length > 0 ? formatted : getFallbackData());
+      } catch (err) {
+        console.error("Failed to fetch compliance issues", err);
+        setComplianceIssues(getFallbackData());
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadIssues();
+  }, []);
+
+  const handleReportIssue = () => {
+    const newIssue = {
+      id: `ISS-${Math.floor(100 + Math.random() * 900)}`,
+      title: "New Policy Violation Reported",
+      description: "An employee has flagged a potential violation of the data handling guidelines.",
+      severity: "Medium",
+      status: "Open",
+      owner: "Global Admin",
+      dueDate: "Jul 25, 2026",
+    };
+    setComplianceIssues([newIssue, ...complianceIssues]);
+    setNotification("Issue reported successfully. It has been added to the queue.");
+    setTimeout(() => setNotification(""), 3000);
+  };
+
+  const handleSendReminders = () => {
+    setNotification("Reminders dispatched to all employees pending acknowledgement.");
+    setTimeout(() => setNotification(""), 3000);
+  };
+
+  const getFallbackData = () => [
     {
       id: "ISS-092",
       title: "Supplier Code of Conduct Audit Pending",
@@ -22,16 +72,7 @@ export default function GovernancePage() {
       status: "In Progress",
       owner: "HR Team",
       dueDate: "Jul 20, 2026",
-    },
-    {
-      id: "ISS-090",
-      title: "Quarterly Board Report Submission",
-      description: "Finalize the ESG metrics for the Q2 stakeholder meeting.",
-      severity: "Critical",
-      status: "Open",
-      owner: "Executive Admin",
-      dueDate: "Jul 12, 2026",
-    },
+    }
   ];
 
   const getSeverityStyle = (severity: string) => {
@@ -56,11 +97,22 @@ export default function GovernancePage() {
           <p className="text-muted-foreground mt-1">Track policies, audits, and compliance issues across the organization.</p>
         </div>
         
-        <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm">
+        <button 
+          onClick={handleReportIssue}
+          className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm"
+        >
           <AlertTriangle className="w-4 h-4" />
           Report Issue
         </button>
       </div>
+
+      {/* Floating Notification */}
+      {notification && (
+        <div className="fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-in slide-in-from-top-2 duration-300">
+          <CheckCircle className="w-5 h-5" />
+          <span className="font-medium">{notification}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
@@ -133,7 +185,10 @@ export default function GovernancePage() {
                 </div>
               </div>
             </div>
-            <button className="w-full mt-6 bg-secondary hover:bg-secondary/80 text-foreground font-medium py-2 rounded-lg transition-colors text-sm">
+            <button 
+              onClick={handleSendReminders}
+              className="w-full mt-6 bg-secondary hover:bg-secondary/80 text-foreground font-medium py-2 rounded-lg transition-colors text-sm"
+            >
               Send Reminders
             </button>
           </div>

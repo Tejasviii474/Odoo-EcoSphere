@@ -19,13 +19,29 @@ class UserBase(BaseModel):
     department_id: Optional[int] = None
 
 class UserCreate(UserBase):
-    pass
+    password: str
+    role: str = "employee"
 
 class User(UserBase):
     id: int
     total_xp: int
 
     model_config = ConfigDict(from_attributes=True)
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    role: str
+    name: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserResponse
 
 # --- Category Schemas ---
 class CategoryBase(BaseModel):
@@ -157,6 +173,29 @@ class DepartmentScore(DepartmentScoreBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+class DepartmentResponse(BaseModel):
+    id: str
+    name: str
+    code: str
+    employee_count: int
+    status: bool
+
+class DepartmentScoreResponse(BaseModel):
+    department_id: str
+    name: str
+    environmental_score: float
+    social_score: float
+    governance_score: float
+    total_score: float
+
+class CustomReportResponse(BaseModel):
+    module: str
+    department_id: str
+    metric: str
+    value: float | str
+    date: Optional[str] = None
+    description: str
 
 # --- AI Verification Response Schema ---
 class AIVerificationResponse(BaseModel):

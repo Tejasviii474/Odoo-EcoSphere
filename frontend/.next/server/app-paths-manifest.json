@@ -1,0 +1,7 @@
+{
+  "/dashboard/page": "app/dashboard/page.js",
+  "/environmental/page": "app/environmental/page.js",
+  "/governance/page": "app/governance/page.js",
+  "/challenges/page": "app/challenges/page.js",
+  "/social/page": "app/social/page.js"
+}
